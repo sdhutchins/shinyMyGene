@@ -6,6 +6,7 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(mygene)
 
 getData <- function() {
   
@@ -16,48 +17,43 @@ getData <- function() {
   gDat
 }
 
-getPlotCols <- function() {
-  g3 <- c("dodgerblue2", # red
-          "green4",
-          "#6A3D9A") # purple
-  g3
-}
-
 # Get the raw data
 gDatRaw <- getData()
 
-# Get the list of colours to use for plotting
-plotCols <- getPlotCols()
 
-ui <- fluidPage(inverse = TRUE,
+ui <- navbarPage(inverse = TRUE,
+                 title = "Gene Info Viz",
                 theme = shinytheme("sandstone"),
-                tags$head(
-                  tags$link(rel = "icon", href = "favicon-96x96.png")),
-  titlePanel("Gene Info Viz"),
+                
+                # Create a tab panel for the MyGene Tool
+                tabPanel("MyGene Tool",
+                         verbatimTextOutput("citemygene")),
+                tabPanel("MyGene Tool"),
   
-  # Create a new Row in the UI for selectInputs
-  fluidRow(
-    column(4,
-           selectInput("t",
-                       "Tier:",
-                       c("All",
-                         unique(as.character(gDatRaw$Tier)))))),
-  fluidRow(
-    column(4,
-           selectInput("name",
-                       "Gene Name:",
-                       c("All",
-                         unique(as.character(gDatRaw$Gene.Symbol)))))),
-  fluidRow(
-    column(4,
-           br(),
-           downloadButton("downloadData", "Download table"),
-           br(), br())),
-  
-  # Create a new row for the table.
-  fluidRow(
-    DT::dataTableOutput("table")
-  )
+                # Create a tab panel for the table view
+                tabPanel("Gene Table View",
+                         fluidRow(
+                           column(4,
+                                  selectInput("t",
+                                     "Tier:",
+                                     c("All",
+                                       unique(as.character(gDatRaw$Tier)))))),
+                fluidRow(
+                  column(4,
+                         selectInput("name",
+                                     "Gene Name:",
+                                     c("All",
+                                       unique(as.character(gDatRaw$Gene.Symbol)))))),
+                fluidRow(
+                  column(4,
+                         br(),
+                         downloadButton("downloadData", "Download table"),
+                         br(), br())),
+                
+                # Create a new row for the table.
+                fluidRow(
+                  DT::dataTableOutput("table")
+  ))
 )
 
 server <- function(input, output) {
@@ -81,6 +77,8 @@ server <- function(input, output) {
     s = input$table_rows_selected
     write.csv(gDatRaw[s,], file, sep = ",", row.names = FALSE)
   })
+  
+  output$citemygene <- renderText({ invisible("Adam Mark, Ryan Thompson, Cyrus Afrasiabi and Chunlei Wu (2014). mygene: Access MyGene.Info_ services. R package version 1.10.0.") })
   
 }
 
