@@ -27,7 +27,7 @@ ui <- navbarPage(inverse = TRUE,
                 
                 # Create a tab panel for the MyGene Tool
                 tabPanel("MyGene Tool",
-                         verbatimTextOutput("citemygene")),
+                         tags$footer(verbatimTextOutput("citemygene"))),
                 tabPanel("MyGene Tool"),
   
                 # Create a tab panel for the table view

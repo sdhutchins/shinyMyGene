@@ -3,6 +3,8 @@ title:
 account: g109
 server: shinyapps.io
 appId: 155941
-bundleId: 707686
+bundleId: 721610
 url: https://g109.shinyapps.io/geneinfoapp/
-when: 1486767347.87499
+when: 1487839742.60836
+asMultiple: FALSE
+asStatic: FALSE
