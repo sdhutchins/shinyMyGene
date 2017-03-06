@@ -11,14 +11,14 @@ library(mygene)
 getData <- function() {
   
   # read the data file
-  gDat <- read.table(file.path("Data/final_gene_info.csv"), sep = ",",
+  gData <- read.table(file.path("Data/final_gene_info.csv"), sep = ",",
                      header = TRUE, row.names = NULL, allowEscapes = FALSE)
   
-  gDat
+  gData
 }
 
 # Get the raw data
-gDatRaw <- getData()
+gDataRaw <- getData()
 
 
 ui <- navbarPage(inverse = TRUE,
@@ -34,16 +34,7 @@ ui <- navbarPage(inverse = TRUE,
                 tabPanel("Gene Table View",
                          fluidRow(
                            column(4,
-                                  selectInput("t",
-                                     "Tier:",
-                                     c("All",
-                                       unique(as.character(gDatRaw$Tier)))))),
-                fluidRow(
-                  column(4,
-                         selectInput("name",
-                                     "Gene Name:",
-                                     c("All",
-                                       unique(as.character(gDatRaw$Gene.Symbol)))))),
+                                  selectInput("Tier", "Choose Tier", choices = c("All", "1", "2", "3", "0"), selected = "1"))),
                 fluidRow(
                   column(4,
                          br(),
@@ -52,31 +43,24 @@ ui <- navbarPage(inverse = TRUE,
                 
                 # Create a new row for the table.
                 fluidRow(
-                  DT::dataTableOutput("table")
+                  DT::dataTableOutput("table1")
   ))
 )
 
 server <- function(input, output) {
   
-  # Filter data based on selections
-  output$table <- DT::renderDataTable(DT::datatable({
-    data <- gDatRaw
-    if (input$t != "All") {
-      data <- data[data$Tier == input$t,]
-    }
-    if (input$name != "All") {
-      data <- data[data$Gene.Symbol == input$name,]
-    }
-    data
+  tiers <- reactive({
+    t <- subset(gDataRaw, Tier == input$Tier)
+    return(t)
+  })
+  output$table1 <- DT::renderDataTable(DT::datatable({tiers()
   },
   escape = FALSE,
   rownames = NULL,
   style = 'bootstrap'))
-  
-  output$downloadData = downloadHandler('genedata.csv', content = function(file) {
-    s = input$table_rows_selected
-    write.csv(gDatRaw[s,], file, sep = ",", row.names = FALSE)
-  })
+
+  output$downloadData = downloadHandler(filename = function() { paste('tier', input$Tier, 'genes.csv', sep='') }, 
+                                        content = function(file) {write.csv(tiers(), file, sep = ",", row.names = FALSE)})
   
   output$citemygene <- renderText({ invisible("Adam Mark, Ryan Thompson, Cyrus Afrasiabi and Chunlei Wu (2014). mygene: Access MyGene.Info_ services. R package version 1.10.0.") })
   
