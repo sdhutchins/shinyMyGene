@@ -138,3 +138,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 .Rproj.user
+
+# More R files
+.RData
+.Rhistory
