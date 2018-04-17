@@ -142,3 +142,4 @@ $RECYCLE.BIN/
 # More R files
 .RData
 .Rhistory
+rsconnect/
